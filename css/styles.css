@@ -1,0 +1,29 @@
+#toolbar {
+	position: fixed;
+	top: 50px;
+	width: 100%;
+	background-color: #ddd;
+	padding: 6px 0;
+}
+
+#issue-list-table {
+	margin-top: 110px;
+}
+
+.progress-panel {
+	position: fixed;
+	bottom: 0; left: 0; right: 0;
+	padding: 10px 50px;
+	background-color: #ddd;
+}
+
+.progress-panel .progress {
+	margin-bottom: 0;
+}
+
+.issue-list-col-number { width: 4em; text-align: right; }
+.issue-list-col-triagelabel { width: 5em; }
+.issue-list-col-triagelabel .label { font-size: 85%; }
+.issue-list-col-labels { width: 9em; }
+.issue-list-col-score { text-align: right; }
+.issue-list-col-score .badge  { background-color:#b94a48; font-size: 100%; }

@@ -1,0 +1,25 @@
+<!--
+  The navigation UI that is docked to the top of the window.
+  Parameters:
+   * route: The currently selected navigation parameters.
+-->
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Knockout Triage</a>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <!-- Could generate this programmatically from the routes, but there's only two... -->
+        <li data-bind="css: { active: route().triaged }"><a href="#">Triaged</a></li>
+        <li data-bind="css: { active: !route().triaged }"><a href="#untriaged">Untriaged</a></li>
+      </ul>
+    </div>
+  </div>
+</div>

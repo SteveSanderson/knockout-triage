@@ -1,0 +1,16 @@
+<!--
+	A generic progress bar that appears in a panel docked to the bottom of the window.
+	Parameters:
+	 * visible: Boolean value to define whether or not the panel is visible.
+	 * value: Current progress percentage, as an observable number from 0 to 100.
+	 * caption: Text to show on the progress bar.
+-->
+<div class="progress-panel" data-bind="visible: visible">
+  <div class="progress progress-striped active">
+    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+         data-bind="attr: { 'aria-valuenow': value },
+                    style: { width: value() + '%' },
+                    text: caption">
+    </div>
+  </div>
+</div>
