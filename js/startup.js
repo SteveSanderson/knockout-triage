@@ -24,6 +24,11 @@ define(["jquery", "knockout", "js/router", "knockout-customElements", "bootstrap
         template: { require: "text!components/navBar/navBar.html" }
     });
 
+    ko.components.register("login-status", {
+        viewModel: { require: "components/loginStatus/loginStatus" },
+        template: { require: "text!components/loginStatus/loginStatus.html" }
+    });
+
     ko.components.register("issue-list", {
         template: { require: "text!components/issueList/issueList.html" },
         viewModel: { require: "components/issueList/issueList" }

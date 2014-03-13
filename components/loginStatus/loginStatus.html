@@ -1,0 +1,27 @@
+<!-- ko if: displayMode === 'dropdown' -->
+    <div class="btn-group navbar-btn">
+        <!-- ko if: loginName -->
+            <button type="button" class="btn btn-default dropdown-toggle login-dropdown" data-toggle="dropdown">
+                <span data-bind="text: loginName"></span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#" data-bind="click: signOut">Sign out</a></li>
+            </ul>
+        <!-- /ko -->
+        <!-- ko ifnot: loginName -->
+            <a href="auth.html" role="button" class="btn btn-default login-dropdown">
+                Sign in
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+        <!-- /ko -->
+    </div>
+<!-- /ko -->
+<!-- ko if: displayMode === 'text' -->
+    <!-- ko if: loginName -->
+        <a href="#" data-bind="click: signOut">Sign out <span data-bind="text: loginName"></span></a>
+    <!-- /ko -->
+    <!-- ko ifnot: loginName -->
+        <a href="auth.html">Sign in</a>
+    <!-- /ko -->
+<!-- /ko -->

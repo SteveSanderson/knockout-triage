@@ -27,3 +27,19 @@
 .issue-list-col-labels { width: 9em; }
 .issue-list-col-score { text-align: right; }
 .issue-list-col-score .badge  { background-color:#b94a48; font-size: 100%; }
+
+.nav .login-dropdown {
+	background-color: #304D8D;
+	border-color: rgb(18, 19, 87);
+	color: white;
+}
+
+.login-dropdown .glyphicon {
+	font-size: 12px;
+}
+
+.nav .login-dropdown:hover, .nav .open .dropdown-toggle.btn-default.login-dropdown, .nav .open > a.login-dropdown {
+	background-color: #5675BA;
+	border-color: rgb(18, 19, 87);
+	color: white;
+}
