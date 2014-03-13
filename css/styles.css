@@ -4,6 +4,7 @@
 	width: 100%;
 	background-color: #ddd;
 	padding: 6px 0;
+	z-index: 1;
 }
 
 #issue-list-table {
@@ -21,12 +22,15 @@
 	margin-bottom: 0;
 }
 
-.issue-list-col-number { width: 4em; text-align: right; }
-.issue-list-col-triagelabel { width: 5em; }
-.issue-list-col-triagelabel .label { font-size: 85%; }
-.issue-list-col-labels { width: 9em; }
-.issue-list-col-score { text-align: right; }
-.issue-list-col-score .badge  { background-color:#b94a48; font-size: 100%; }
+.table .issue-list-col-number { width: 4em; text-align: right; }
+.table .issue-list-col-triagelabel { width: 15em; padding: 0; height: 0; /* Weirdly, height:0 is necessary to make the following height:100% work */ }
+.table .issue-list-col-triagelabel > .cell-filler { display: table; width: 100%; height: 100%; }
+.table .issue-list-col-triagelabel a { display: table-cell; padding: 8px; text-decoration: none; }
+.table .issue-list-col-triagelabel a:hover { background-color: #DEF; }
+.table .issue-list-col-labels { width: 9em; }
+#issue-list-table .label { font-size: 85%; }
+.table .issue-list-col-score { text-align: right; }
+.table .issue-list-col-score .badge  { background-color:#b94a48; font-size: 100%; }
 
 .nav .login-dropdown {
 	background-color: #304D8D;
@@ -43,3 +47,28 @@
 	border-color: rgb(18, 19, 87);
 	color: white;
 }
+
+label-selector {
+	display: block;
+}
+
+label-selector button {
+	width: 6em;
+}
+
+.selected-choice {
+	font-weight: bold;
+}
+
+.triage-meta-warning {
+	margin-top: 8px;
+	font-weight: bold;
+	color: red;
+}
+
+.saving-row { opacity: 0.5; background-color: #ddd; }
+.saving-row * { cursor: progress; }
+
+/* Stop the page shifting when a scrollbar appears due to a modal - hide the modal's scrollbar, but not the underlying page's */
+.modal-open { overflow: auto; }
+.modal::-webkit-scrollbar { width: 0 !important }

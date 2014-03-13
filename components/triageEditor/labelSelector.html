@@ -1,0 +1,6 @@
+<div class="btn-group" data-bind="foreach: choices">
+  <button type="button" class="btn btn-default"
+          data-bind="text: labelText, click: select,
+                     css: { 'selected-choice': isSelected },
+                     style: { backgroundColor: backColor, color: foreColor }"></button>
+</div>

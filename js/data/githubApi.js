@@ -1,7 +1,8 @@
-define(["knockout", "knockout-mapping", "jquery", "js/data/issue"], function(ko, koMapping, $, Issue) {
-	var baseUrl = "https://api.github.com",
-		issuesUrl = baseUrl + "/repos/knockout/knockout/issues?page=1&per_page=100",
-        untrustedUserOAuthToken = "20e1f5bd105c41e4d249686d9b47da698f352171";
+define(["knockout", "knockout-mapping", "jquery", "js/data/issue", "js/authData"], function(ko, koMapping, $, Issue, authData) {
+	var baseUrl = 'https://api.github.com',
+		issuesUrl = baseUrl + '/repos/knockout/knockout/issues?page=1&per_page=100',
+        applyTriageLabelsUrl = 'https://knockout-triage-server.azurewebsites.net/triage/{number}',
+        untrustedUserOAuthToken = "20e1f5bd105c41e4d249686d9b47da698f352171"; // Some user with no permissions or organization memberships, empty scope
 
     function GithubApi() {
     	this.issues = koMapping.fromJS([], {
@@ -68,6 +69,8 @@ define(["knockout", "knockout-mapping", "jquery", "js/data/issue"], function(ko,
                 didUseAuth = true;
             }
 
+            ensureSupportsCors();
+
             return $.ajax(ajaxOptions).then(null, function(error) {
                 if (!didUseAuth && error.getResponseHeader("X-RateLimit-Remaining") === "0") {
                     // Looks like anonymous access has run out for this IP. Switch to using
@@ -88,9 +91,40 @@ define(["knockout", "knockout-mapping", "jquery", "js/data/issue"], function(ko,
                 koMapping.fromJS(rawData, self.issues);
             },
     		function (error) {
-    			alert(error.responseText || error.toString());
+    			alert(error.responseText || JSON.stringify(error));
     		}
     	);
+    }
+
+    GithubApi.prototype.applyTriageLabels = function(issue, triageLabels) {
+        var url = applyTriageLabelsUrl.replace('{number}', issue.number);
+
+        issue.isSaving(true);
+        postJSON(url, triageLabels)
+            .then(function(data) { issue.populate(data); })
+            .always(function() { issue.isSaving(false); });
+    };
+
+    function postJSON(url, objectToStringify) {
+        return $.ajax({
+            url: url,
+            type: 'POST',
+            data: JSON.stringify(objectToStringify),
+            dataType: 'json',
+            contentType: 'application/json',
+            headers: {
+                'KO-Triage-Auth-Login': authData.user,
+                'KO-Triage-Auth-Timestamp': authData.timestamp,
+                'KO-Triage-Auth-Hmac': authData.hmac
+            }
+        });
+    }
+
+    function ensureSupportsCors() {
+        var supportsCors = 'withCredentials' in new XMLHttpRequest();
+        if (!supportsCors) {
+            alert('This site uses CORS to access the GitHub API.\n\nYour browser doesn\'t support CORS. We could work around it, but since this site is only for web developers, you should just use a better browser.\n\nIt\'s going to fail now.');
+        }
     }
 
     return new GithubApi();

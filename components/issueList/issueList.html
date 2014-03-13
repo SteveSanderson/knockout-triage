@@ -8,29 +8,29 @@
       <tr>
         <th class="issue-list-col-number">#</th>
         <th>Title</th>
-        <th class="issue-list-col-triagelabel">Type</th>
-        <th class="issue-list-col-triagelabel">Severity</th>
-        <th class="issue-list-col-triagelabel">Affected</th>
+        <th>Type/Severity/Affects</th>
         <th class="issue-list-col-labels">Labels</th>
         <th class="issue-list-col-score">Score</th>
       </tr>
     </thead>
     <tbody data-bind="foreach: sortedFilteredIssues">
-      <tr>
+      <tr data-bind="css: { 'saving-row': isSaving }">
         <td class="issue-list-col-number">
           <a data-bind="text: number, attr: { href: htmlUrl }" target="_blank"></a>
         </td>
         <td>
           <a data-bind="text: title, attr: { href: htmlUrl }" target="_blank"></a>
         </td>
-        <td data-bind="if: type">
-          <span class="label label-default" data-bind="text: type().shortText, style: { backgroundColor: typeColor }"></span>
-        </td>
-        <td data-bind="if: severity">
-          <span class="label label-default" data-bind="text: severity().shortText, style: { backgroundColor: severityColor }"></span>
-        </td>
-        <td data-bind="if: affected">
-          <span class="label label-default" data-bind="text: affected().shortText, style: { backgroundColor: affectedColor }"></span>
+        <td class="issue-list-col-triagelabel">
+          <div class="cell-filler">
+            <a data-bind="click: !isSaving() && $parent.canEdit && $parent.selectIssue,
+                          attr: { href: (!isSaving() && $parent.canEdit) || null }">
+              <span class="label label-default" data-bind="triageLabel: type"></span>
+              <span class="label label-default" data-bind="triageLabel: severity"></span>
+              <span class="label label-default" data-bind="triageLabel: affected"></span>
+              <span data-bind="visible: $parent.canEdit && !(type() || severity() || affected())">Edit</span>
+            </a>
+          </div>
         </td>
         <td data-bind="foreach: unknownLabels">
           <span class="label label-default" data-bind="text: text, style: { backgroundColor: color }"></span>
@@ -42,6 +42,8 @@
     </tbody>
   </table>
 </div>
+
+<triage-editor issue="{{ selectedIssue }}"></triage-editor>
 
 <progress-panel caption="Loading issues&hellip;"
                 visible="{{ loading }}"

@@ -19,7 +19,7 @@ requirejs.config({
     }
 });
 
-define(["jquery", "knockout", "js/router", "knockout-customElements", "bootstrap"], function($, ko, router) {
+define(["jquery", "knockout", "js/router", "js/bindings", "knockout-customElements", "bootstrap"], function($, ko, router) {
     ko.components.register("nav-bar", {
         template: { require: "text!components/navBar/navBar.html" }
     });
@@ -27,6 +27,11 @@ define(["jquery", "knockout", "js/router", "knockout-customElements", "bootstrap
     ko.components.register("login-status", {
         viewModel: { require: "components/loginStatus/loginStatus" },
         template: { require: "text!components/loginStatus/loginStatus.html" }
+    });
+
+    ko.components.register("triage-editor", {
+        viewModel: { require: "components/triageEditor/triageEditor" },
+        template: { require: "text!components/triageEditor/triageEditor.html" }
     });
 
     ko.components.register("issue-list", {
