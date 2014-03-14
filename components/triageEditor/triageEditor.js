@@ -8,8 +8,10 @@ define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(mo
         this.selectedType = ko.observable();
         this.selectedSeverity = ko.observable();
         this.selectedAffected = ko.observable();
-        this.selectedOtherApi = ko.observable();
-        this.selectedOtherBreaking = ko.observable();
+        this.selectableOtherLabels = [
+            { uniqueId: 'api-choice', label: 'api', text: 'Affects API surface', selected: ko.observable() },
+            { uniqueId: 'breaking-choice', label: 'breaking', text: 'Breaking change', selected: ko.observable() }
+        ];
         this.selectedMeta = ko.computed(function() {
             return this.selectedType() === Issue.labels.type.meta;
         }, this);
@@ -21,20 +23,16 @@ define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(mo
                 this.selectedType(issue.type());
                 this.selectedSeverity(issue.severity());
                 this.selectedAffected(issue.affected());
-                this.selectedOtherApi(issueHasOtherLabel(issue, 'api'));
-                this.selectedOtherBreaking(issueHasOtherLabel(issue, 'breaking'));
+
+                ko.utils.arrayForEach(this.selectableOtherLabels, function(otherLabel) {
+                    otherLabel.selected(issueHasOtherLabel(issue, otherLabel.label));
+                });
             }
         }, this);
 
         this.typeChoices = makeComputedArrayOfChoices(Issue.labels.type, this.selectedType);
         this.severityChoices = makeComputedArrayOfChoices(Issue.labels.severity, this.selectedSeverity);
         this.affectedChoices = makeComputedArrayOfChoices(Issue.labels.affected, this.selectedAffected);
-        this.otherChoices = ko.computed(function() {
-            return [
-                { uniqueId: 'api-choice', label: 'api', text: 'Affects API surface', checked: this.selectedOtherApi },
-                { uniqueId: 'breaking-choice', label: 'breaking', text: 'Breaking change', checked: this.selectedOtherBreaking }
-            ];
-        }, this);
     }
 
     TriageEditorViewModel.prototype.save = function() {
@@ -43,10 +41,15 @@ define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(mo
             type: this.selectedType() ? this.selectedType().text : null,
             severity: this.selectedSeverity() ? this.selectedSeverity().text : null,
             affected: this.selectedAffected() ? this.selectedAffected().text : null,
-            api: this.selectedOtherApi(),
-            breaking: this.selectedOtherBreaking()
+            api: this.isOtherLabelSelected('api'),
+            breaking: this.isOtherLabelSelected('breaking')
         });
         this.issue(null);
+    };
+
+    TriageEditorViewModel.prototype.isOtherLabelSelected = function(label) {
+        var labelObject = ko.utils.arrayFilter(this.selectableOtherLabels, function(l) { return l.label === label; })[0];
+        return labelObject.selected();
     };
 
     TriageEditorViewModel.prototype.dispose = function() {
@@ -54,7 +57,6 @@ define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(mo
         this.typeChoices.dispose();
         this.severityChoices.dispose();
         this.affectedChoices.dispose();
-        this.otherChoices.dispose();
     };
 
     function makeComputedArrayOfChoices(choicesHash, selectedChoice) {

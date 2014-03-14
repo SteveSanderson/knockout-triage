@@ -36,11 +36,11 @@
 
                 <div class="form-group">
                     <label class="control-label">Other</label>
-                    <div data-bind="foreach: otherChoices">
+                    <div data-bind="foreach: selectableOtherLabels">
                         <div class="inline-2-cols">
                             <div class="input-group">
                                 <span class="input-group-addon">
-                                    <input type="checkbox" data-bind="attr: { id: uniqueId }, checked: checked" />
+                                    <input type="checkbox" data-bind="attr: { id: uniqueId }, checked: selected" />
                                 </span>
                                 <label class="form-control" data-bind="attr: { for: uniqueId }, text: text"></label>
                             </div>
