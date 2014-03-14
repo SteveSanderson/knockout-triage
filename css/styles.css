@@ -78,6 +78,8 @@ label-selector button {
 .saving-row { opacity: 0.5; background-color: #ddd; }
 .saving-row * { cursor: progress; }
 
+label.form-control[for] { cursor: pointer; }
+
 /* Stop the page shifting when a scrollbar appears due to a modal - hide the modal's scrollbar, but not the underlying page's */
 .modal-open { overflow: auto; }
 .modal::-webkit-scrollbar { width: 0 !important }
