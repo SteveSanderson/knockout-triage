@@ -68,13 +68,12 @@ label-selector button {
 
 .inline-2-cols {
 	display: inline-block;
-	width: calc(50% - 8px);
+	width: calc(50% - 6px);
 	min-width: 15em;
 }
 
-.inline-2-cols:nth-child(2n + 1) {
-	margin-right: 12px;
-}
+.inline-2-cols:nth-child(n + 3) { margin-top: 5px; } /* Gap above all except first row (i.e., first two) */
+.inline-2-cols:nth-child(2n + 1) { margin-right: 6px; } /* Gap to right of elements on left column */
 
 .saving-row { opacity: 0.5; background-color: #ddd; }
 .saving-row * { cursor: progress; }
