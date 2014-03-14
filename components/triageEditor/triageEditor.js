@@ -10,7 +10,9 @@ define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(mo
         this.selectedAffected = ko.observable();
         this.selectableOtherLabels = [
             { uniqueId: 'api-choice', label: 'api', text: 'Affects API surface', selected: ko.observable() },
-            { uniqueId: 'breaking-choice', label: 'breaking', text: 'Breaking change', selected: ko.observable() }
+            { uniqueId: 'breaking-choice', label: 'breaking', text: 'Breaking change', selected: ko.observable() },
+            { uniqueId: 'waiting-choice', label: 'waiting', text: 'Waiting for info', selected: ko.observable() },
+            { uniqueId: 'close-choice', label: 'close', text: 'Should close', selected: ko.observable() }
         ];
         this.selectedMeta = ko.computed(function() {
             return this.selectedType() === Issue.labels.type.meta;
@@ -42,7 +44,9 @@ define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(mo
             severity: this.selectedSeverity() ? this.selectedSeverity().text : null,
             affected: this.selectedAffected() ? this.selectedAffected().text : null,
             api: this.isOtherLabelSelected('api'),
-            breaking: this.isOtherLabelSelected('breaking')
+            breaking: this.isOtherLabelSelected('breaking'),
+            waiting: this.isOtherLabelSelected('waiting'),
+            close: this.isOtherLabelSelected('close')
         });
         this.issue(null);
     };
