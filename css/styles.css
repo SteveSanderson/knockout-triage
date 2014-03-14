@@ -66,6 +66,16 @@ label-selector button {
 	color: red;
 }
 
+.inline-2-cols {
+	display: inline-block;
+	width: calc(50% - 8px);
+	min-width: 15em;
+}
+
+.inline-2-cols:nth-child(2n + 1) {
+	margin-right: 12px;
+}
+
 .saving-row { opacity: 0.5; background-color: #ddd; }
 .saving-row * { cursor: progress; }
 

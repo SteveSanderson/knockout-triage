@@ -36,14 +36,16 @@
 
                 <div class="form-group">
                     <label class="control-label">Other</label>
-                    <!-- ko foreach: otherChoices -->
-                        <div class="input-group" style="margin-bottom: 8px;">
-                            <span class="input-group-addon">
-                                <input type="checkbox" data-bind="attr: { id: uniqueId }, checked: checked" />
-                            </span>
-                            <label class="form-control" data-bind="attr: { for: uniqueId }, text: text"></label>
+                    <div data-bind="foreach: otherChoices">
+                        <div class="inline-2-cols">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <input type="checkbox" data-bind="attr: { id: uniqueId }, checked: checked" />
+                                </span>
+                                <label class="form-control" data-bind="attr: { for: uniqueId }, text: text"></label>
+                            </div>
                         </div>
-                    <!-- /ko -->
+                    </div>
                 </div>
             </div>
         </form>
