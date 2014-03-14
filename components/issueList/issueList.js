@@ -10,7 +10,7 @@ define(["module", "knockout", "knockout-batch", "js/data/githubApi", "components
         // Public
         this.allIssues = githubApi.issues;
         this.loading = githubApi.loading;
-        this.filter = new FilterModel(this.allIssues, this.loading, params.triaged);
+        this.filter = new FilterModel(this.allIssues, githubApi.hasLoaded, params.triaged);
         this.loadingPercentage = githubApi.loadingPercentage;
         this.selectedIssue = ko.observable();
         this.canEdit = authData.canEdit;

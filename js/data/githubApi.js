@@ -1,62 +1,63 @@
 define(["knockout", "knockout-mapping", "jquery", "js/data/issue", "js/authData"], function(ko, koMapping, $, Issue, authData) {
-	var baseUrl = 'https://api.github.com',
-		issuesUrl = baseUrl + '/repos/knockout/knockout/issues?page=1&per_page=100',
+    var baseUrl = 'https://api.github.com',
+        issuesUrl = baseUrl + '/repos/knockout/knockout/issues?page=1&per_page=100',
         applyTriageLabelsUrl = 'https://knockout-triage-server.azurewebsites.net/triage/{number}',
         untrustedUserOAuthToken = "20e1f5bd105c41e4d249686d9b47da698f352171"; // Some user with no permissions or organization memberships, empty scope
 
     function GithubApi() {
-    	this.issues = koMapping.fromJS([], {
+        this.issues = koMapping.fromJS([], {
             key: function(issue) { return issue.number; },
             create: function(info) { return new Issue(); },
             update: function(info) { info.target.populate(info.data); return info.target; }
         });
 
-    	this.loadingPercentage = ko.observable(null);
-    	this.loading = ko.computed(function() {
-    		return typeof this.loadingPercentage() === 'number';
-    	}, this);
+        this.loadingPercentage = ko.observable(null);
+        this.loading = ko.computed(function() {
+            return typeof this.loadingPercentage() === 'number';
+        }, this);
+        this.hasLoaded = ko.observable(false);
     }
 
     GithubApi.prototype.loadIssues = function() {
-    	var self = this;
-    	return loadRemainingData(issuesUrl, 1, null, []).always(function() {
-    		self.loadingPercentage(null);
-    	});
+        var self = this;
+        return loadRemainingData(issuesUrl, 1, null, []).always(function() {
+            self.loadingPercentage(null);
+        });
 
-    	function loadRemainingData(startUrl, currentPageIndex, totalPageCount, dataSoFar) {
-    		if (startUrl) {
-		    	self.loadingPercentage(totalPageCount ? 100 * (currentPageIndex+1) / totalPageCount : 0);
+        function loadRemainingData(startUrl, currentPageIndex, totalPageCount, dataSoFar) {
+            if (startUrl) {
+                self.loadingPercentage(totalPageCount ? 100 * (currentPageIndex+1) / totalPageCount : 0);
 
-		    	var ajaxOptions = {
-		    		url: startUrl,
-		    		dataType: 'json',
-		    		headers: {},
-		    		cache: false
-		    	};
-		    	
-		    	return ajaxRequestWithAuth(ajaxOptions).then(function(newData, status, jqXHR) {
-					var linkUrls = extractLinkUrlsFromLinkHeader(jqXHR),
-		    			totalPageCount = totalPageCount || (1 + parseInt(linkUrls.last.match(/[?&]page=(\d+)/)[1]));
-		    		return loadRemainingData(linkUrls.next, currentPageIndex + 1, totalPageCount, dataSoFar.concat(newData));
-		    	});
-    		} else {
-    			return dataSoFar;
-    		}
-    	}
+                var ajaxOptions = {
+                    url: startUrl,
+                    dataType: 'json',
+                    headers: {},
+                    cache: false
+                };
 
-    	function extractLinkUrlsFromLinkHeader(jqXHR) {
-    		var linkHeader = jqXHR.getResponseHeader('link'),
-    			linkHeaderParts = linkHeader.split(/,\s*/),
-    			linkHeaderMatches = ko.utils.arrayMap(linkHeaderParts, function(linkHeaderPart) {
-    				var match = linkHeaderPart.match(/<(.*?)>; rel="(.*?)"/);
-    				return { rel: match[2], url: match[1] };
-    			}),
-    			result = {};
-    		for (var i = 0; i < linkHeaderMatches.length; i++) {
-    			result[linkHeaderMatches[i].rel] = linkHeaderMatches[i].url;
-    		}
-    		return result;
-    	}
+                return ajaxRequestWithAuth(ajaxOptions).then(function(newData, status, jqXHR) {
+                    var linkUrls = extractLinkUrlsFromLinkHeader(jqXHR),
+                        totalPageCount = totalPageCount || (1 + parseInt(linkUrls.last.match(/[?&]page=(\d+)/)[1]));
+                    return loadRemainingData(linkUrls.next, currentPageIndex + 1, totalPageCount, dataSoFar.concat(newData));
+                });
+            } else {
+                return dataSoFar;
+            }
+        }
+
+        function extractLinkUrlsFromLinkHeader(jqXHR) {
+            var linkHeader = jqXHR.getResponseHeader('link'),
+                linkHeaderParts = linkHeader.split(/,\s*/),
+                linkHeaderMatches = ko.utils.arrayMap(linkHeaderParts, function(linkHeaderPart) {
+                    var match = linkHeaderPart.match(/<(.*?)>; rel="(.*?)"/);
+                    return { rel: match[2], url: match[1] };
+                }),
+                result = {};
+            for (var i = 0; i < linkHeaderMatches.length; i++) {
+                result[linkHeaderMatches[i].rel] = linkHeaderMatches[i].url;
+            }
+            return result;
+        }
 
         // GitHub's anonymous API allows 60 requests per IP per hour. This is usually enough,
         // but in the event that you run out, this function transparently switches over to
@@ -86,14 +87,15 @@ define(["knockout", "knockout-mapping", "jquery", "js/data/issue", "js/authData"
 
     GithubApi.prototype.refreshIssues = function() {
         var self = this;
-    	this.loadIssues().then(
-    		function (rawData) {
+        this.loadIssues().then(
+            function (rawData) {
                 koMapping.fromJS(rawData, self.issues);
+                self.hasLoaded(true);
             },
-    		function (error) {
-    			alert(error.responseText || JSON.stringify(error));
-    		}
-    	);
+            function (error) {
+                alert(error.responseText || JSON.stringify(error));
+            }
+        );
     }
 
     GithubApi.prototype.applyTriageLabels = function(issue, triageLabels) {

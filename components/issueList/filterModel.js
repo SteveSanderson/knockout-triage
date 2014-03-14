@@ -1,10 +1,10 @@
 define(["knockout", "js/data/issue"], function(ko, Issue) {
-    function FilterModel(allIssues, loading, triageStatus) {
+    function FilterModel(allIssues, hasLoaded, triageStatus) {
         // Private
         this._allMatchingTriageStatus = filterObservableArray(allIssues, function(issue) {
             return issue.isTriaged() === triageStatus();
         });
-        this._loading = loading;
+        this._hasLoaded = hasLoaded;
 
         // Public
         this.selectedIssueType = ko.observable();
@@ -25,7 +25,7 @@ define(["knockout", "js/data/issue"], function(ko, Issue) {
             matchingIssues = predicate ? filterObservableArray(issuesToConsider, predicate) : issuesToConsider,
             selectedIssueType = this.selectedIssueType;
         return {
-            text: ko.computed(function() { return text + (this._loading() ? '' : ' (' + matchingIssues().length + ')'); }, this),
+            text: ko.computed(function() { return text + (this._hasLoaded() ? ' (' + matchingIssues().length + ')' : ''); }, this),
             predicate: predicate,
             matchingIssues: matchingIssues,
             select: function() { selectedIssueType(this); }

@@ -21,6 +21,7 @@ requirejs.config({
 
 define(["jquery", "knockout", "js/router", "js/bindings", "knockout-customElements", "bootstrap"], function($, ko, router) {
     ko.components.register("nav-bar", {
+        viewModel: { require: "components/navBar/navBar" },
         template: { require: "text!components/navBar/navBar.html" }
     });
 

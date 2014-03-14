@@ -17,8 +17,12 @@
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
         <!-- Could generate this programmatically from the routes, but there's only two... -->
-        <li data-bind="css: { active: route().triaged }"><a href="#">Triaged</a></li>
-        <li data-bind="css: { active: !route().triaged }"><a href="#untriaged">Untriaged</a></li>
+        <li data-bind="css: { active: route().triaged }">
+          <a href="#" data-bind="text: triagedText"></a>
+        </li>
+        <li data-bind="css: { active: !route().triaged }">
+          <a href="#untriaged" data-bind="text: untriagedText"></a>
+        </li>
 
         <!-- When in mobile mode, left-align the login button -->
         <li class="visible-xs">
