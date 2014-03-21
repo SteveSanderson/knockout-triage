@@ -1,6 +1,6 @@
-define(["module", "knockout", "knockout-batch", "js/data/githubApi", "components/issueList/filterModel", "js/authData"], function(module, ko, batch, githubApi, FilterModel, authData) {
+define(["module", "knockout", "knockout-batch", "text!./issueList.html", "text!./issueListToolbar/issueListToolbar.html", "js/data/githubApi", "./filterModel", "js/authData"], function(module, ko, batch, issueListTemplate, toolbarTemplate, githubApi, FilterModel, authData) {
     ko.components.register("issue-list-toolbar", {
-        template: { require: "text!" + ko.components.relativeUrl(module.uri, "issueListToolbar/issueListToolbar.html") }
+        template: toolbarTemplate
     });
 
     function IssueListViewModel(params) {
@@ -44,5 +44,5 @@ define(["module", "knockout", "knockout-batch", "js/data/githubApi", "components
         this.filter.dispose();
     };
 
-    return IssueListViewModel;
+    return { viewModel: IssueListViewModel, template: issueListTemplate };
 });

@@ -20,26 +20,10 @@ requirejs.config({
 });
 
 define(["jquery", "knockout", "js/router", "js/bindings", "knockout-customElements", "bootstrap"], function($, ko, router) {
-    ko.components.register("nav-bar", {
-        viewModel: { require: "components/navBar/navBar" },
-        template: { require: "text!components/navBar/navBar.html" }
-    });
-
-    ko.components.register("login-status", {
-        viewModel: { require: "components/loginStatus/loginStatus" },
-        template: { require: "text!components/loginStatus/loginStatus.html" }
-    });
-
-    ko.components.register("triage-editor", {
-        viewModel: { require: "components/triageEditor/triageEditor" },
-        template: { require: "text!components/triageEditor/triageEditor.html" }
-    });
-
-    ko.components.register("issue-list", {
-        template: { require: "text!components/issueList/issueList.html" },
-        viewModel: { require: "components/issueList/issueList" }
-    });
-
+    ko.components.register("nav-bar", { require: "components/navBar/navBar" });
+    ko.components.register("login-status", { require: "components/loginStatus/loginStatus" });
+    ko.components.register("triage-editor", { require: "components/triageEditor/triageEditor" });
+    ko.components.register("issue-list", { require: "components/issueList/issueList" });
     ko.components.register("progress-panel", {
         template: { require: "text!components/progressPanel/progressPanel.html" }
     });

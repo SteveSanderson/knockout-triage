@@ -1,4 +1,4 @@
-define(["knockout", "js/data/githubApi"], function(ko, githubApi) {
+define(["knockout", "text!./navBar.html", "js/data/githubApi"], function(ko, template, githubApi) {
     function NavBarViewModel(params) {
         this.route = params.route;
         this.triagedText = ko.computed(function() {
@@ -25,5 +25,5 @@ define(["knockout", "js/data/githubApi"], function(ko, githubApi) {
         }
     }
 
-    return NavBarViewModel;
+    return { viewModel: NavBarViewModel, template: template };
 });

@@ -1,6 +1,6 @@
-define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(module, ko, githubApi, Issue) {
+define(["module", "knockout", "text!./triageEditor.html", "text!./labelSelector.html", "js/data/githubApi", "js/data/issue"], function(module, ko, triageEditorTemplate, labelSelectorTemplate, githubApi, Issue) {
     ko.components.register("label-selector", {
-        template: { require: "text!" + ko.components.relativeUrl(module.uri, "labelSelector.html") }
+        template: labelSelectorTemplate
     });
 
     function TriageEditorViewModel(params) {
@@ -100,5 +100,5 @@ define(["module", "knockout", "js/data/githubApi", "js/data/issue"], function(mo
         return false;
     }
 
-    return TriageEditorViewModel;
+    return { viewModel: TriageEditorViewModel, template: triageEditorTemplate };
 });

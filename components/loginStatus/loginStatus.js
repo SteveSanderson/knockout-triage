@@ -1,4 +1,4 @@
-define(["knockout", "js/authData"], function(ko, authData) {
+define(["knockout", "text!./loginStatus.html", "js/authData"], function(ko, template, authData) {
     function LoginStatusViewModel(params) {
         this.loginName = ko.observable(authData ? authData.user : null);
         this.displayMode = ko.unwrap(params.mode);
@@ -9,5 +9,5 @@ define(["knockout", "js/authData"], function(ko, authData) {
         location.reload();
     };
 
-    return LoginStatusViewModel;
+    return { viewModel: LoginStatusViewModel, template: template };
 });

@@ -88,6 +88,8 @@
                                 }
                             }
                         }, callback);
+                    } else if (typeof config === 'string') {
+                        callback(ko.utils.parseHtmlFragment(config));
                     } else {
                         callback();
                     }
@@ -181,7 +183,7 @@
                         loadedComponents[name] = result;
                         delete loadingComponents[name];
                         subscribable.notifySubscribers(result);
-                    });    
+                    });
                 }
             },
 
@@ -199,9 +201,7 @@
                         // { viewModel: constructor, template: markup }
                         require([config.require], function(module) {
                             loadFromConfig(name, {
-                                template: module.template && {
-                                    provider: function(callback) { callback(module.template); }
-                                },
+                                template: module.template,
                                 viewModel: module.viewModel
                             }, callback);
                         });
