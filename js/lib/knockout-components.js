@@ -193,26 +193,45 @@
                         throw new Error("Unknown component: " + name);
                     }
 
-                    // Run the two loaders simultaneously. Could generalise to > 2, but this is sufficient here.
-                    var loadedTemplate = undefined,
-                        loadedCreateViewModel = undefined;
-                    getFirstLoaderResult(ko.components.loaders.slice(0), "loadTemplate", [name, config], function(template) {
-                        if (loadedCreateViewModel !== undefined) {
-                            callback({ template: template, createViewModel: loadedCreateViewModel });
-                        } else {
-                            loadedTemplate = template;
-                        }
-                    });
-                    getFirstLoaderResult(ko.components.loaders.slice(0), "loadViewModel", [name, config], function(createViewModel) {
-                        if (loadedTemplate !== undefined) {
-                            callback({ template: loadedTemplate, createViewModel: createViewModel });
-                        } else {
-                            loadedCreateViewModel = createViewModel;
-                        }
-                    })
+                    if (config.require) {
+                        // Handle the single-module config format
+                        // For this prototype, it's limited to modules of the form:
+                        // { viewModel: constructor, template: markup }
+                        require([config.require], function(module) {
+                            loadFromConfig(name, {
+                                template: module.template && {
+                                    provider: function(callback) { callback(module.template); }
+                                },
+                                viewModel: module.viewModel
+                            }, callback);
+                        });
+                    } else {
+                        // Handle the { viewModel: ..., template: ... } config format
+                        loadFromConfig(name, config, callback);
+                    }
                 });
             }
         };
+
+        function loadFromConfig(name, config, callback) {
+            // Run the two loaders simultaneously. Could generalise to > 2, but this is sufficient here.
+            var loadedTemplate = undefined,
+                loadedCreateViewModel = undefined;
+            getFirstLoaderResult(ko.components.loaders.slice(0), "loadTemplate", [name, config], function(template) {
+                if (loadedCreateViewModel !== undefined) {
+                    callback({ template: template, createViewModel: loadedCreateViewModel });
+                } else {
+                    loadedTemplate = template;
+                }
+            });
+            getFirstLoaderResult(ko.components.loaders.slice(0), "loadViewModel", [name, config], function(createViewModel) {
+                if (loadedTemplate !== undefined) {
+                    callback({ template: loadedTemplate, createViewModel: createViewModel });
+                } else {
+                    loadedCreateViewModel = createViewModel;
+                }
+            })
+        }
 
         function getFirstLoaderResult(loaders, methodName, args, callback) {
             var nextMethod;
