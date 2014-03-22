@@ -1,4 +1,7 @@
-var gulp = require('gulp'),
+var fs = require('fs'),
+    vm = require('vm'),
+    merge = require('deeply'),
+    gulp = require('gulp'),
     rjs = require('gulp-requirejs'),
     concat = require('gulp-concat'),
     clean = require('gulp-clean'),
@@ -9,40 +12,25 @@ var gulp = require('gulp'),
     streamqueue = require('streamqueue'),
     es = require('event-stream'),
     runSequence = require('run-sequence'),
-    requireJsConfig = {
-        out: "scripts.js",
-        baseUrl: ".",
-        name: "js/startup",
-        include: [
-            "requireLib",
-            "components/navBar/navBar",
-            "components/issueList/issueList",
-            "components/loginStatus/loginStatus",
-            "components/triageEditor/triageEditor",
-            "text!components/progressPanel/progressPanel.html"
-        ],
+    requireJsRuntimeConfig = vm.runInNewContext(fs.readFileSync('js/requirejs-config.js') + '; require;');
+    requireJsOptimizerConfig = merge(requireJsRuntimeConfig, {
+        out: 'scripts.js',
+        name: 'js/startup',
         paths: {
-            "requireLib":   "bower_components/requirejs/require",
-            "jquery":       "bower_components/jquery/dist/jquery",
-            "bootstrap":    "bower_components/components-bootstrap/js/bootstrap.min",
-            "crossroads":   "bower_components/crossroads/dist/crossroads.min",
-            "hasher":       "bower_components/hasher/dist/js/hasher.min",
-            "signals":      "bower_components/js-signals/dist/signals.min",
-
-            "text": "js/lib/require.text",
-            "knockout": "js/lib/knockout-3.1.0",
-            "knockout-components": "js/lib/knockout-components",
-            "knockout-customElements": "js/lib/knockout-customElements",
-            "knockout-mapping": "js/lib/knockout.mapping-latest",
-            "knockout-batch": "js/lib/knockout-batch",
+            requireLib: 'bower_components/requirejs/require'
         },
-        shim: {
-            "bootstrap": { deps: ["jquery"] }
-        }
-    };
+        include: [
+            'requireLib',
+            'components/navBar/navBar',
+            'components/issueList/issueList',
+            'components/loginStatus/loginStatus',
+            'components/triageEditor/triageEditor',
+            'text!components/progressPanel/progressPanel.html'
+        ]
+    });
 
 gulp.task('js', function () {
-    return rjs(requireJsConfig)
+    return rjs(requireJsOptimizerConfig)
         .pipe(insert.append('\nrequire(["js/startup"]);'))
         .pipe(uglify({ preserveComments: 'some' }))
         .pipe(gulp.dest('./deploy/'));
