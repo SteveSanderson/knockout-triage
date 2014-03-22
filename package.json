@@ -1,0 +1,25 @@
+{
+  "name": "knockout-triage",
+  "version": "0.0.0",
+  "description": "Triage site for Knockout.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SteveSanderson/knockout-triage.git"
+  },
+  "author": "Steve Sanderson",
+  "license": "MIT",
+  "homepage": "http://triage.knockoutjs.com",
+  "devDependencies": {
+    "gulp": "~3.5.6",
+    "gulp-requirejs": "git://github.com/RobinThrift/gulp-requirejs.git#6fb08d427dda7463a07b25be3fc931f58e660b54",
+    "gulp-concat": "~2.2.0",
+    "gulp-clean": "~0.2.4",
+    "run-sequence": "~0.3.6",
+    "streamqueue": "0.0.5",
+    "event-stream": "~3.1.0",
+    "gulp-replace": "~0.2.0",
+    "gulp-uglify": "~0.2.1",
+    "gulp-insert": "~0.2.0",
+    "gulp-html-replace": "~1.0.0"
+  }
+}
