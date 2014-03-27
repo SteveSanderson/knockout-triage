@@ -57,11 +57,16 @@ gulp.task('html', function() {
         .pipe(gulp.dest('./deploy/'));
 });
 
+gulp.task('cname', function() {
+    return gulp.src('./CNAME')
+        .pipe(gulp.dest('./deploy/'));
+});
+
 gulp.task('clean', function() {
     return gulp.src('./deploy', { read: false })
         .pipe(clean());
 });
 
 gulp.task('default', function(callback) {
-    return runSequence(['html', 'js', 'css'], callback);
+    return runSequence(['html', 'js', 'css', 'cname'], callback);
 });
