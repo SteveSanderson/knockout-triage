@@ -1,6 +1,8 @@
-// Knockout JavaScript library v3.1.0
-// (c) Steven Sanderson - http://knockoutjs.com/
-// License: MIT (http://www.opensource.org/licenses/mit-license.php)
+/*!
+ * Knockout JavaScript library v3.1.0
+ * (c) Steven Sanderson - http://knockoutjs.com/
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
+ */
 
 (function(){
 var DEBUG=true;

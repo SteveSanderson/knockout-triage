@@ -1,6 +1,8 @@
-// Knockout JavaScript library v3.1.0
-// (c) Steven Sanderson - http://knockoutjs.com/
-// License: MIT (http://www.opensource.org/licenses/mit-license.php)
+/*!
+ * Knockout JavaScript library v3.1.0
+ * (c) Steven Sanderson - http://knockoutjs.com/
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
+ */
 
 (function() {(function(p){var y=this||(0,eval)("this"),w=y.document,K=y.navigator,t=y.jQuery,C=y.JSON;(function(p){"function"===typeof require&&"object"===typeof exports&&"object"===typeof module?p(module.exports||exports,require):"function"===typeof define&&define.amd?define(["exports","require"],p):p(y.ko={})})(function(L,M){function G(a,c){return null===a||typeof a in O?a===c:!1}function P(a,c){var d;return function(){d||(d=setTimeout(function(){d=p;a()},c))}}function Q(a,c){var d;return function(){clearTimeout(d);
 d=setTimeout(a,c)}}function H(b,c,d,e){a.d[b]={init:function(b,h,g,k,l){var n,s;a.da(function(){var k=a.a.c(h()),g=!d!==!k,r=!s;if(r||c||g!==n)r&&a.ea.ha()&&(s=a.a.nb(a.e.childNodes(b),!0)),g?(r||a.e.R(b,a.a.nb(s)),a.Aa(e?e(l,k):l,b)):a.e.fa(b),n=g},null,{H:b});return{controlsDescendantBindings:!0}}};a.g.ca[b]=!1;a.e.O[b]=!0}var a="undefined"!==typeof L?L:{};a.b=function(b,c){for(var d=b.split("."),e=a,f=0;f<d.length-1;f++)e=e[d[f]];e[d[d.length-1]]=c};a.u=function(a,c,d){a[c]=d};a.version="3.1.0";
