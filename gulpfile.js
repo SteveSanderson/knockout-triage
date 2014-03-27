@@ -12,9 +12,10 @@ var fs = require('fs'),
     streamqueue = require('streamqueue'),
     es = require('event-stream'),
     runSequence = require('run-sequence'),
-    requireJsRuntimeConfig = vm.runInNewContext(fs.readFileSync('js/requirejs-config.js') + '; require;');
+    requireJsRuntimeConfig = vm.runInNewContext(fs.readFileSync('src/js/requirejs-config.js') + '; require;');
     requireJsOptimizerConfig = merge(requireJsRuntimeConfig, {
         out: 'scripts.js',
+        baseUrl: './src',
         name: 'js/startup',
         paths: {
             requireLib: 'bower_components/requirejs/require'
@@ -37,19 +38,19 @@ gulp.task('js', function () {
 });
 
 gulp.task('css', function () {
-    var bowerCss = gulp.src('bower_components/components-bootstrap/css/bootstrap.min.css')
+    var bowerCss = gulp.src('src/bower_components/components-bootstrap/css/bootstrap.min.css')
             .pipe(replace(/url\((')?\.\.\/fonts\//g, 'url($1fonts/')),
-        appCss = gulp.src('css/*.css'),
+        appCss = gulp.src('src/css/*.css'),
         emitCss = streamqueue({ objectMode: true }, bowerCss, appCss)
             .pipe(concat('css.css'))
             .pipe(gulp.dest('./deploy/')),
-        emitFonts = gulp.src('./bower_components/components-bootstrap/fonts/*', { base: './bower_components/components-bootstrap/' })
+        emitFonts = gulp.src('./src/bower_components/components-bootstrap/fonts/*', { base: './src/bower_components/components-bootstrap/' })
             .pipe(gulp.dest('./deploy/'));
     return es.concat(emitCss, emitFonts);
 });
 
 gulp.task('html', function() {
-    return gulp.src('./index.html')
+    return gulp.src('./src/index.html')
         .pipe(htmlreplace({
             'css': 'css.css',
             'js': 'scripts.js'
@@ -58,7 +59,7 @@ gulp.task('html', function() {
 });
 
 gulp.task('cname', function() {
-    return gulp.src('./CNAME')
+    return gulp.src('./src/CNAME')
         .pipe(gulp.dest('./deploy/'));
 });
 
