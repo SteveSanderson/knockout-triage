@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------
+// The following custom elements module is a PROTOTYPE. It is not heavily tested.
+// ------------------------------------------------------------------------------
+
 (function(global, undefined) {
     function attachToKo(ko) {
         ko.componentBindingProvider = function(providerToWrap) {
@@ -29,7 +33,7 @@
                 ko.computed(function() {
                     var valueForComponentBindingHandler = {
                         name: node.tagName.toLowerCase(),
-                        data: this._getComponentDataObjectFromAttributes(node, bindingContext)
+                        params: this._getComponentDataObjectFromAttributes(node, bindingContext)
                     };
                     bindings.component = function () { return valueForComponentBindingHandler; };
                 }, this);
@@ -39,7 +43,7 @@
         };
 
         ko.componentBindingProvider.prototype.nodeIsCustomComponentElement = function(node) {
-            return node && (node.nodeType === 1) && ko.components.isRegistered(node.tagName);
+            return node && (node.nodeType === 1) && ko.components.isRegistered(node.tagName.toLowerCase());
         }
 
         ko.componentBindingProvider.prototype._getComponentDataObjectFromAttributes = function(elem, bindingContext) {
@@ -101,16 +105,72 @@
             });
         }
 
+
         ko.bindingProvider.instance = new ko.componentBindingProvider(ko.bindingProvider.instance);
 
-        ko.components.enableCustomElementsOnOldIEIfNeeded();
+        supportOldIE();
+    }
+
+    // Note that since refactoring to build on KO's native components feature, none of the
+    // following old-IE code has been tested or even run on an old IE instance, so might
+    // have stopped working. The real implementation will be tested properly, of course.
+    function supportOldIE() {
+        var oldIeVersion = document && (function() {
+            var version = 3,
+                div = document.createElement('div'),
+                iElems = div.getElementsByTagName('i');
+
+            // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
+            while (
+                div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
+                iElems[0]
+            ) {}
+            return version > 4 ? version : undefined;
+        }());
+
+        if (oldIeVersion < 9) {
+            // Support old IE by patching ko.components.register to ensure that we have called
+            // document.createElement(componentName) at least once before trying to parse any
+            // markup that might use a custom element with that name
+            var allCustomComponentNames = [];
+            ko.components.register = (function(underlyingRegisterFunc) {
+                return function(componentName) {
+                    allCustomComponentNames.push(componentName);
+                    underlyingRegisterFunc.apply(this, arguments);
+                    document.createElement(componentName);
+                };
+            })(ko.components.register);
+
+            // Also to enable custom elements on old IE, we have to call document.createElement(name)
+            // on every document fragment that ever gets created. This is especially important
+            // if you're also using jQuery, because its parseHTML code works by setting .innerHTML
+            // on some element inside a temporary document fragment.
+            // It would be nicer if jQuery exposed some API for registering custom element names,
+            // but it doesn't.
+            document.createDocumentFragment = (function(originalDocumentCreateDocumentFragment) {
+                return function() {
+                    // Note that you *can't* do originalDocumentCreateDocumentFragment.apply(this, arguments)
+                    // because IE6/7 complain "object doesn't support this method". Fortunately the function
+                    // doesn't take any parameters, and doesn't need a "this" value.
+                    var docFrag = originalDocumentCreateDocumentFragment();
+                    if (docFrag.createElement) {
+                        for (var i = 0; i < allCustomComponentNames.length; i++) {
+                            if (componentConfigRegistry.hasOwnProperty(allCustomComponentNames[i])) {
+                                docFrag.createElement(allCustomComponentNames[i]);
+                            }
+                        }
+                    }
+                    return docFrag;
+                };
+            })(document.createDocumentFragment);
+        }
     }
 
     // Determines which module loading scenario we're in, grabs dependencies, and attaches to KO
     function prepareExports() {
         if (typeof define === 'function' && define.amd) {
             // AMD anonymous module
-            define(["knockout", "knockout-components"], attachToKo);
+            define(["knockout"], attachToKo);
         } else if ('ko' in global) {
             // Non-module case - attach to the global instance, and assume
             // knockout-components.js is already loaded.

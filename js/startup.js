@@ -8,8 +8,7 @@ requirejs.config({
         "signals":      "bower_components/js-signals/dist/signals.min",
 
         "text": "js/lib/require.text",
-        "knockout": "js/lib/knockout-3.1.0",
-        "knockout-components": "js/lib/knockout-components",
+        "knockout": "js/lib/knockout-latest",
         "knockout-customElements": "js/lib/knockout-customElements",
         "knockout-mapping": "js/lib/knockout.mapping-latest",
         "knockout-batch": "js/lib/knockout-batch",
