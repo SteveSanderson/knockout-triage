@@ -1,0 +1,15 @@
+<html>
+    <script>
+        if (location.hash) {
+            // This is the callback after auth completes. Store the data.
+            localStorage.authDataJson = decodeURIComponent(location.hash.substring(1));
+            location.href = 'index.html';
+        } else {
+            delete localStorage.authDataJson;
+
+            var uriParser = document.createElement('a');
+            uriParser.setAttribute('href', location.href);
+            location.href = 'https://knockout-triage-server.azurewebsites.net/auth?callbackHost=' + encodeURIComponent(uriParser.host);
+        }
+    </script>
+</html>
