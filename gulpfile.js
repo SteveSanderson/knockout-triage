@@ -1,5 +1,6 @@
 var fs = require('fs'),
     vm = require('vm'),
+    sh = require('execSync'),
     merge = require('deeply'),
     gulp = require('gulp'),
     rjs = require('gulp-requirejs'),
@@ -68,6 +69,31 @@ gulp.task('clean', function() {
         .pipe(clean());
 });
 
+gulp.task('publish', function() {
+    // Technique based on http://happygiraffe.net/blog/2009/07/04/publishing-a-subdirectory-to-github-pages/
+    var sourceDirectory = 'deploy',
+        targetBranch = 'gh-pages',
+        parentSha = sh.exec('git show-ref -s refs/heads/' + targetBranch).stdout.split(/\n/)[0],
+        deploySha = sh.exec('git ls-tree -d HEAD ' + sourceDirectory).stdout.split(/[\s\t]/)[2],
+        commitCommand = 'git commit-tree ' + deploySha + ' -p ' + parentSha + ' -m \'Updating "' + targetBranch + '" to match "' + sourceDirectory + '" directory\'',
+        commitResult = sh.exec(commitCommand),
+        commitSha = commitResult.stdout.replace(/\n/, '');
+    if (commitResult.code !== 0) {
+        throw new Error('git commit-tree error: ' + commitResult.stdout);
+    }
+    var updateRefCommand = 'git update-ref refs/heads/' + targetBranch + ' ' + commitSha,
+        updateRefResult = sh.exec(updateRefCommand);
+    if (updateRefResult.code !== 0) {
+        throw new Error('git update-ref error: ' + updateRefResult.stdout);
+    }
+    console.log('Updated ' + targetBranch + ' to ' + commitSha);
+});
+
 gulp.task('default', function(callback) {
-    return runSequence(['html', 'js', 'css', 'cname'], callback);
+    return runSequence(['html', 'js', 'css', 'cname'], function() {
+        callback();
+        console.log('\nUpdated the \'deploy\' directory. To publish:');
+        console.log(' - gulp publish');
+        console.log(' - git push origin gh-pages\n');
+    });
 });
