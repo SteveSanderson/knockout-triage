@@ -70,6 +70,9 @@ gulp.task('clean', function() {
 });
 
 gulp.task('publish', function() {
+    // This task commits the current contents of the 'deploy' directory to the 'gh-pages' branch.
+    // Run this, and then push gh-pages to GitHub - that will update http://triage.knockoutjs.com/
+    // Don't edit gh-pages by any other means, or your changes will later be overwritten.
     // Technique based on http://happygiraffe.net/blog/2009/07/04/publishing-a-subdirectory-to-github-pages/
     var sourceDirectory = 'deploy',
         targetBranch = 'gh-pages',
