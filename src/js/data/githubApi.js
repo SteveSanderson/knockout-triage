@@ -36,8 +36,8 @@ define(["knockout", "knockout-mapping", "jquery", "js/data/issue", "js/authData"
                 };
 
                 return ajaxRequestWithAuth(ajaxOptions).then(function(newData, status, jqXHR) {
-                    var linkUrls = extractLinkUrlsFromLinkHeader(jqXHR),
-                        totalPageCount = totalPageCount || (1 + parseInt(linkUrls.last.match(/[?&]page=(\d+)/)[1]));
+                    var linkUrls = extractLinkUrlsFromLinkHeader(jqXHR);
+                    totalPageCount = totalPageCount || (1 + parseInt(linkUrls.last.match(/[?&]page=(\d+)/)[1]));
                     return loadRemainingData(linkUrls.next, currentPageIndex + 1, totalPageCount, dataSoFar.concat(newData));
                 });
             } else {
