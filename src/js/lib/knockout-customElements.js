@@ -23,20 +23,22 @@
             if (this.nodeIsCustomComponentElement(node)) {
                 bindings = bindings || {};
                 if (bindings.component) {
-                    throw new Error("Disallowed binding 'component' on element " + node);
+                    throw new Error("Disallowed binding 'component' on custom element " + node);
                 }
 
                 // Wrap the data extraction inside a ko.computed purely to suppress dependency detection.
                 // We don't want the component to be torn down and rebuilt whenever any of the observables
                 // read to supply its data changes. Instead we wrap any such observables and pass them
                 // onto the component itself, so it can react to changes without being completely replaced.
-                ko.computed(function() {
+                // **Disabling this because I don't think it's necessary any more, now this has switched
+                // to evaluating 'params' attributes inside computeds anyway**
+                //ko.computed(function() {
                     var valueForComponentBindingHandler = {
                         name: node.tagName.toLowerCase(),
                         params: this._getComponentDataObjectFromAttributes(node, bindingContext)
                     };
                     bindings.component = function () { return valueForComponentBindingHandler; };
-                }, this);
+                //}, this);
             }
 
             return bindings;
@@ -47,64 +49,21 @@
         }
 
         ko.componentBindingProvider.prototype._getComponentDataObjectFromAttributes = function(elem, bindingContext) {
-            var attributes = elem.attributes || [],
-                result = {};
-
-            for (var i = 0; i < attributes.length; i++) {
-                var attribute = attributes[i];
-                if (attribute.specified === false) {
-                    // IE7 returns about a hundred "unspecified" attributes on every element. Skip them.
-                    continue;
-                }
-
-                var attributeName = attribute.name,
-                    propertyName = toCamelCase(attributeName),
-                    valueText = attribute.value || "";
-
-                if (valueText.substring(0, 2) === "{{" && valueText.substring(valueText.length - 2) === "}}") {
-                    // Dynamic expressions are converted to writable computeds
-                    // TODO: Handle "{{abc}} some string {{def}}", i.e., proper interpolation
-                    valueText = valueText.substring(2, valueText.length - 2);
-
-                    var valueDummyBinding = "value: " + valueText,
-                        valueAccessors = this._nativeBindingProvider.parseBindingsString(valueDummyBinding, bindingContext, elem, {
-                            'valueAccessors': true
-                        }),
-                        valueReader = valueAccessors.value,
-                        valueReaderInitialValue = valueReader();
-
-                    if (ko.isObservable(valueReaderInitialValue)) {
-                        // If it's just an observable instance, pass it straight through without wrapping
-                        result[propertyName] = valueReaderInitialValue;
-                    } else {
-                        // If it's not an observable instance, but is evaluated with reference to observables,
-                        // then we promote the parameter to an observable so the receiving component can
-                        // observe changes without us having to tear down and replace the component on each change.
-                        //
-                        // We differentiate between "a function of some observables" and "a function of no observables"
-                        // by testing whether or not the wrapped computed has any active dependencies.
-                        var valueWriter = valueAccessors._ko_property_writers ? valueAccessors._ko_property_writers().value : undefined,
-                            valueWrappedAsObservable = ko.computed({
-                                read: valueReader,
-                                write: valueWriter
-                            }, null, { disposeWhenNodeIsRemoved: elem });
-                        result[propertyName] = valueWrappedAsObservable.isActive() ? valueWrappedAsObservable : valueReaderInitialValue;
-                    }
-                } else {
-                    // Everything else is interpreted as a string, and is passed literally
-                    result[propertyName] = valueText;
-                }
+            var result = {},
+                paramsAttribute = elem.getAttribute('params');
+            
+            if (paramsAttribute) {
+                var params = this._nativeBindingProvider.parseBindingsString(paramsAttribute, bindingContext, elem, { valueAccessors: true });
+                ko.utils.objectForEach(params, function(paramName, paramValue) {
+                    // If the parameter *evaluation* involves some observable that might later change,
+                    // supply it as a read-only computed. Otherwise pass through the value directly.
+                    var computed = ko.computed(paramValue, null, { disposeWhenNodeIsRemoved: elem });
+                    result[paramName] = computed.isActive() ? computed : computed();
+                });
             }
 
             return result;
-        }
-
-        function toCamelCase(str) {
-            return str.replace(/-([a-z])/g, function(a, capture) {
-                return capture.toUpperCase();
-            });
-        }
-
+        };
 
         ko.bindingProvider.instance = new ko.componentBindingProvider(ko.bindingProvider.instance);
 
@@ -153,13 +112,7 @@
                     // because IE6/7 complain "object doesn't support this method". Fortunately the function
                     // doesn't take any parameters, and doesn't need a "this" value.
                     var docFrag = originalDocumentCreateDocumentFragment();
-                    if (docFrag.createElement) {
-                        for (var i = 0; i < allCustomComponentNames.length; i++) {
-                            if (componentConfigRegistry.hasOwnProperty(allCustomComponentNames[i])) {
-                                docFrag.createElement(allCustomComponentNames[i]);
-                            }
-                        }
-                    }
+                    ko.utils.arrayForEach(allCustomComponentNames, docFrag.createElement.bind(docFrag));
                     return docFrag;
                 };
             })(document.createDocumentFragment);

@@ -1,6 +1,6 @@
-<issue-list-toolbar loading="{{ loading }}"
-                    filter="{{ filter }}"
-                    on-refresh="{{ refresh.bind($data) }}"></issue-list-toolbar>
+<issue-list-toolbar params="loading: loading,
+                            filter: filter,
+                            onRefresh: refresh.bind($data)"></issue-list-toolbar>
 
 <div id="issue-list-table" class="container">
   <table class="table">
@@ -43,8 +43,8 @@
   </table>
 </div>
 
-<triage-editor issue="{{ selectedIssue }}"></triage-editor>
+<triage-editor params="issue: selectedIssue"></triage-editor>
 
-<progress-panel caption="Loading issues&hellip;"
-                visible="{{ loading }}"
-                value="{{ loadingPercentage }}"></progress-panel>
+<progress-panel params="caption: 'Loading issues&hellip;',
+                       visible: loading,
+                       value: loadingPercentage"></progress-panel>

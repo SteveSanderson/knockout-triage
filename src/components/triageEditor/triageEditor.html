@@ -17,7 +17,7 @@
         <form role="form">
             <div class="form-group">
                 <label class="control-label">Type</label>
-                <label-selector choices="{{ typeChoices }}"></label-selector>
+                <label-selector params="choices: typeChoices"></label-selector>
                 <div class="triage-meta-warning" data-bind="visible: selectedMeta">
                     The issue will be removed from the triaging system.
                 </div>
@@ -26,12 +26,12 @@
             <div data-bind="visible: !selectedMeta()">
                 <div class="form-group">
                     <label class="control-label">Severity</label>
-                    <label-selector choices="{{ severityChoices }}"></label-selector>
+                    <label-selector params="choices: severityChoices"></label-selector>
                 </div>
 
                 <div class="form-group">
                     <label class="control-label">Affected</label>
-                    <label-selector choices="{{ affectedChoices }}"></label-selector>
+                    <label-selector params="choices: affectedChoices"></label-selector>
                 </div>
 
                 <div class="form-group">

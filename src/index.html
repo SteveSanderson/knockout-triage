@@ -14,8 +14,8 @@
     <!-- endbuild -->
   </head>
   <body>
-    <nav-bar route="{{ route }}"></nav-bar>
-    <issue-list triaged="{{ route().triaged }}"></issue-list>
+    <nav-bar params="route: route"></nav-bar>
+    <issue-list params="triaged: route().triaged"></issue-list>
 
     <!--
       Want to see the source code?
