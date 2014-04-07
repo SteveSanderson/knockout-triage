@@ -4,13 +4,22 @@
 
 (function(global, undefined) {
     function attachToKo(ko) {
+        ko.components.getComponentNameFromNode = function(node) {
+            if (node && node.nodeType === 1) {
+                var tagNameLower = node.tagName.toLowerCase();
+                return ko.components.isRegistered(tagNameLower) ? tagNameLower : null;
+            }
+
+            return null;
+        };
+
         ko.componentBindingProvider = function(providerToWrap) {
             this._providerToWrap = providerToWrap;
             this._nativeBindingProvider = new ko.bindingProvider();
         };
 
         ko.componentBindingProvider.prototype.nodeHasBindings = function(node) {
-            if (this.nodeIsCustomComponentElement(node)) {
+            if (ko.components.getComponentNameFromNode(node)) {
                 return true;
             }
 
@@ -18,9 +27,10 @@
         };
 
         ko.componentBindingProvider.prototype.getBindingAccessors = function(node, bindingContext) {
-            var bindings = this._providerToWrap.getBindingAccessors.apply(this._providerToWrap, arguments);
+            var bindings = this._providerToWrap.getBindingAccessors.apply(this._providerToWrap, arguments),
+                componentName = ko.components.getComponentNameFromNode(node);
 
-            if (this.nodeIsCustomComponentElement(node)) {
+            if (componentName) {
                 bindings = bindings || {};
                 if (bindings.component) {
                     throw new Error("Disallowed binding 'component' on custom element " + node);
@@ -34,7 +44,7 @@
                 // to evaluating 'params' attributes inside computeds anyway**
                 //ko.computed(function() {
                     var valueForComponentBindingHandler = {
-                        name: node.tagName.toLowerCase(),
+                        name: componentName,
                         params: this._getComponentDataObjectFromAttributes(node, bindingContext)
                     };
                     bindings.component = function () { return valueForComponentBindingHandler; };
@@ -44,14 +54,10 @@
             return bindings;
         };
 
-        ko.componentBindingProvider.prototype.nodeIsCustomComponentElement = function(node) {
-            return node && (node.nodeType === 1) && ko.components.isRegistered(node.tagName.toLowerCase());
-        }
-
         ko.componentBindingProvider.prototype._getComponentDataObjectFromAttributes = function(elem, bindingContext) {
             var result = {},
                 paramsAttribute = elem.getAttribute('params');
-            
+
             if (paramsAttribute) {
                 var params = this._nativeBindingProvider.parseBindingsString(paramsAttribute, bindingContext, elem, { valueAccessors: true });
                 ko.utils.objectForEach(params, function(paramName, paramValue) {
