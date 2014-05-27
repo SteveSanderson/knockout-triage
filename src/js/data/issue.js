@@ -26,6 +26,7 @@ define(["knockout"], function(ko) {
         this.htmlUrl = null;
         this.title = ko.observable();
         this.isSaving = ko.observable(false);
+        this.milestone = ko.observable();
 
         // Triage fields
         this.type = ko.observable();
@@ -47,6 +48,7 @@ define(["knockout"], function(ko) {
         this.number = data.number;
         this.htmlUrl = data.html_url;
         this.title(data.title);
+        this.milestone(data.milestone || null);
         this.updateTriageFields(data.labels);
     };
 

@@ -15,8 +15,32 @@ define(["knockout", "js/data/issue"], function(ko, Issue) {
         ];
         this.selectedIssueType(this.issueTypes[0]);
 
+        // Maintain an observable list of distinct milestones
+        this.selectedMilestone = ko.observable(null);
+        var milestones = ko.computed(function() {
+            // The preceding 'null' is the choice for 'no milestone filter'
+            return [null].concat(getAllDistinctMilestones(allIssues()));
+        });
+        this.milestoneChoices = ko.computed(function() {
+            return ko.utils.arrayMap(milestones(), function(milestone) {
+                var predicate = milestone ? function(issue) { return issue.milestone() && issue.milestone().title === milestone; } : null;
+                return this._makeMilestoneOption(milestone, milestone || "All milestones", predicate);
+            }.bind(this));
+        }, this);
+
+        // Whenever the set of milestone choices changes, try to preserve selection by looking
+        // for a new one with the same title as the old one
+        this.milestoneChoices.subscribe(function(newMilestoneChoices) {
+            var previousSelectedMilestoneText = this.selectedMilestone() ? this.selectedMilestone().title : null,
+                correspondingNewMilestone = ko.utils.arrayFilter(newMilestoneChoices, function(m) {
+                    return m && m.title === previousSelectedMilestoneText;
+                })[0];
+            this.selectedMilestone(correspondingNewMilestone || newMilestoneChoices[0]);
+        }, this);
+        this.selectedMilestone(this.milestoneChoices()[0]);
+        
         this.output = ko.computed(function() {
-            return this.selectedIssueType().matchingIssues();
+            return this.selectedMilestone().matchingIssues();
         }, this);
     }
 
@@ -29,6 +53,21 @@ define(["knockout", "js/data/issue"], function(ko, Issue) {
             predicate: predicate,
             matchingIssues: matchingIssues,
             select: function() { selectedIssueType(this); }
+        };
+    };
+
+    FilterModel.prototype._makeMilestoneOption = function(title, text, predicate) {
+        // Note that "issuesToConsider" is the output from the "selectedIssueType" filter.
+        // This is how the two filters are chained together.
+        var issuesToConsider = this.selectedIssueType().matchingIssues,
+            matchingIssues = predicate ? filterObservableArray(issuesToConsider, predicate) : issuesToConsider,
+            selectedMilestone = this.selectedMilestone;
+        return {
+            title: title,
+            text: ko.computed(function() { return text + (this._hasLoaded() ? ' (' + matchingIssues().length + ')' : ''); }, this),
+            predicate: predicate,
+            matchingIssues: matchingIssues,
+            select: function() { selectedMilestone(this); }
         };
     };
 
@@ -45,6 +84,17 @@ define(["knockout", "js/data/issue"], function(ko, Issue) {
         return ko.computed(function() {
             return ko.utils.arrayFilter(observableArray(), predicate);
         });
+    }
+
+    function getAllDistinctMilestones(allIssues) {
+        var result = [];
+        for(var i = 0; i < allIssues.length; i++) {
+            var milestoneTitle = allIssues[i].milestone() ? allIssues[i].milestone().title : null;
+            if (milestoneTitle && result.indexOf(milestoneTitle) < 0) {
+                result.push(milestoneTitle);
+            }
+        }
+        return result.sort();
     }
 
     return FilterModel;
