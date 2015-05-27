@@ -1,9 +1,9 @@
 var fs = require('fs'),
     vm = require('vm'),
-    sh = require('execSync'),
+    sh = require('sync-exec'),
     merge = require('deeply'),
     gulp = require('gulp'),
-    rjs = require('gulp-requirejs'),
+    rjs = require('gulp-requirejs-optimize'),
     concat = require('gulp-concat'),
     clean = require('gulp-clean'),
     replace = require('gulp-replace'),
@@ -18,6 +18,7 @@ var fs = require('fs'),
         out: 'scripts.js',
         baseUrl: './src',
         name: 'js/startup',
+        optimize: 'none',
         paths: {
             requireLib: 'bower_components/requirejs/require'
         },
@@ -32,7 +33,10 @@ var fs = require('fs'),
     });
 
 gulp.task('js', function () {
-    return rjs(requireJsOptimizerConfig)
+    // The current version of gulp-requirejs-optimize doesn't work with only an RJS config specifying files to include.
+    // It does nothing unless you also feed it at least one input file. Arbitrarily send 'startup.js' to it.
+    return gulp.src('gulpfile.js')
+        .pipe(rjs(requireJsOptimizerConfig))
         .pipe(insert.append('\nrequire(["js/startup"]);'))
         .pipe(uglify({ preserveComments: 'some' }))
         .pipe(gulp.dest('./deploy/'));
